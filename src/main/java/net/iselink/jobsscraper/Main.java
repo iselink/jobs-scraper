@@ -1,5 +1,6 @@
 package net.iselink.jobsscraper;
 
+import net.iselink.jobsscraper.utils.ArgumentParser;
 import net.iselink.jobsscraper.utils.Configuration;
 import net.iselink.jobsscraper.utils.DiscordWebHook;
 
@@ -8,9 +9,13 @@ import java.net.URISyntaxException;
 
 public class Main {
 	public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
+		ArgumentParser ap = new ArgumentParser();
+
+		ap.parse(args);
+
 		Configuration configuration;
 		try {
-			configuration = Configuration.loadConfig("config.json");
+			configuration = Configuration.loadConfig(ap.getValue("config", "config.json"));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
