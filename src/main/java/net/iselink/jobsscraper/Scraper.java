@@ -8,11 +8,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Scraper {
 
@@ -104,5 +107,89 @@ public class Scraper {
 		return Instant.parse(timestamp);
 	}
 
+	public Comparation compareWith(String filename) throws IOException {
+		try (FileReader reader = new FileReader(filename)) {
+			Scraper scraper = new GsonBuilder()
+					.excludeFieldsWithoutExposeAnnotation().create().fromJson(reader, Scraper.class);
+			return compareWith(scraper.items);
+		}
+	}
 
+
+	public Comparation compareWith(List<Entry> entries) {
+		Comparation comp = new Comparation();
+
+		//find all unchanged items
+		//i.e. - only items in both lists
+		comp.unchangedEntries = items.stream().filter(entry -> {
+			for (Entry entry1 : entries) {
+				if (entry.getLink().equalsIgnoreCase(entry1.getLink())) {
+					return true;
+				}
+			}
+			return false;
+		}).collect(Collectors.toList());
+
+		//find new offers
+		//i.e. - only items from new list which aren't in old
+		comp.addedEntries = items.stream().filter(entry -> {
+			for (Entry e : entries) {
+				if (entry.getLink().equalsIgnoreCase(e.getLink())) {
+					return false;
+				}
+			}
+			return true;
+		}).collect(Collectors.toList());
+
+		//find old (removed) offers
+		//i.e. - only items from old list which aren't in new
+		comp.removedEntries = entries.stream().filter(entry -> {
+			for (Entry e : items) {
+				if (entry.getLink().equalsIgnoreCase(e.getLink())) {
+					return false;
+				}
+			}
+			return true;
+		}).collect(Collectors.toList());
+
+		return comp;
+	}
+
+	public static class Comparation {
+
+		private List<Entry> unchangedEntries = new ArrayList<>();
+		private List<Entry> removedEntries = new ArrayList<>();
+		private List<Entry> addedEntries = new ArrayList<>();
+
+		private Comparation() {
+		}
+
+
+		public List<Entry> getUnchangedEntries() {
+			return unchangedEntries;
+		}
+
+		public Comparation setUnchangedEntries(List<Entry> unchangedEntries) {
+			this.unchangedEntries = unchangedEntries;
+			return this;
+		}
+
+		public List<Entry> getRemovedEntries() {
+			return removedEntries;
+		}
+
+		public Comparation setRemovedEntries(List<Entry> removedEntries) {
+			this.removedEntries = removedEntries;
+			return this;
+		}
+
+		public List<Entry> getAddedEntries() {
+			return addedEntries;
+		}
+
+		public Comparation setAddedEntries(List<Entry> addedEntries) {
+			this.addedEntries = addedEntries;
+			return this;
+		}
+	}
 }

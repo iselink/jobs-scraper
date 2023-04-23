@@ -22,12 +22,31 @@ public class Main {
 		);
 
 		scraper.scrape();
-		scraper.save("xd.json");
 
-		DiscordWebHook webhook = new DiscordWebHook(new DiscordWebHook.Embed("Job search report", String.format("Current count of job items: %d", scraper.getEntriesCount()), new DiscordWebHook.Field[]{
-				new DiscordWebHook.Field("Job count", String.format("%d", scraper.getEntriesCount()))
+		Scraper.Comparation c = scraper.compareWith("save.json");
+		scraper.save("save.json");
+
+		DiscordWebHook webhook = new DiscordWebHook(new DiscordWebHook.Embed("Job search report", "", new DiscordWebHook.Field[]{
+				new DiscordWebHook.Field("Added jobs", Integer.toString(c.getAddedEntries().size())),
+				new DiscordWebHook.Field("Removed jobs", Integer.toString(c.getRemovedEntries().size())),
+				new DiscordWebHook.Field("Unchanged jobs", Integer.toString(c.getUnchangedEntries().size())),
 		}));
-
 		webhook.send(configuration.getWebhookAddress());
+
+		StringBuilder msg = new StringBuilder();
+		msg.append("```diff");
+		c.getAddedEntries().forEach(entry -> {
+			msg.append("\n+ ").append(entry.getTitle()).append("\t").append(entry.getLink());
+		});
+		c.getRemovedEntries().forEach(entry -> {
+			msg.append("\n- ").append(entry.getTitle());
+		});
+		msg
+				.append("\n\n")
+				.append("Total added/removed: ")
+				.append(c.getAddedEntries().size()).append('/').append(c.getRemovedEntries().size())
+				.append("```");
+
+		new DiscordWebHook(msg.toString()).send(configuration.getWebhookAddress());
 	}
 }
