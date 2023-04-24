@@ -37,9 +37,10 @@ public class Main {
 		}
 
 		DiscordWebHook webhook = new DiscordWebHook(new DiscordWebHook.Embed("Job search report", "", new DiscordWebHook.Field[]{
-				new DiscordWebHook.Field("Added jobs", Integer.toString(c.getAddedEntries().size())),
-				new DiscordWebHook.Field("Removed jobs", Integer.toString(c.getRemovedEntries().size())),
-				new DiscordWebHook.Field("Unchanged jobs", Integer.toString(c.getUnchangedEntries().size())),
+				new DiscordWebHook.Field("Added jobs", Integer.toString(c.getAddedEntries().size()), true),
+				new DiscordWebHook.Field("Removed jobs", Integer.toString(c.getRemovedEntries().size()), true),
+				new DiscordWebHook.Field("Unchanged jobs", Integer.toString(c.getUnchangedEntries().size()), true),
+				new DiscordWebHook.Field("Total count now", Integer.toString(scraper.getEntriesCount()), true)
 		}));
 		webhook.send(configuration.getWebhookAddress());
 
@@ -51,11 +52,7 @@ public class Main {
 		c.getRemovedEntries().forEach(entry -> {
 			msg.append("\n- ").append(entry.getTitle());
 		});
-		msg
-				.append("\n\n")
-				.append("Total added/removed: ")
-				.append(c.getAddedEntries().size()).append('/').append(c.getRemovedEntries().size())
-				.append("```");
+		msg.append("```");
 
 		new DiscordWebHook(msg.toString()).send(configuration.getWebhookAddress());
 	}
