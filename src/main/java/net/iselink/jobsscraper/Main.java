@@ -31,6 +31,11 @@ public class Main {
 		Scraper.Comparation c = scraper.compareWith("save.json");
 		scraper.save("save.json");
 
+		if (c.getRemovedEntries().size() == 0 && c.getAddedEntries().size() == 0) {
+			//as there isn't any changes, don't push pointless message
+			return;
+		}
+
 		DiscordWebHook webhook = new DiscordWebHook(new DiscordWebHook.Embed("Job search report", "", new DiscordWebHook.Field[]{
 				new DiscordWebHook.Field("Added jobs", Integer.toString(c.getAddedEntries().size())),
 				new DiscordWebHook.Field("Removed jobs", Integer.toString(c.getRemovedEntries().size())),
