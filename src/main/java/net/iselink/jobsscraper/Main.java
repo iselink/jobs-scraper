@@ -10,12 +10,20 @@ import java.net.URISyntaxException;
 public class Main {
 	public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
 		ArgumentParser ap = new ArgumentParser();
+		ArgumentParser.Flag confFlag = new ArgumentParser.Flag("config", "Configuration file to load", "config.json");
+		ap.getRootCommand().addFlag(confFlag);
 
-		ap.parse(args);
+
+		try {
+			ap.parse(args);
+		} catch (ArgumentParser.UndefinedFlagException | ArgumentParser.UndefinedCommandException e) {
+			//TODO: print help
+			System.exit(1);
+		}
 
 		Configuration configuration;
 		try {
-			configuration = Configuration.loadConfig(ap.getValue("config", "config.json"));
+			configuration = Configuration.loadConfig(confFlag.getValue());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
