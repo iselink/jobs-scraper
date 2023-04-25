@@ -1,5 +1,6 @@
 package net.iselink.jobsscraper;
 
+import net.iselink.jobsscraper.script.Script;
 import net.iselink.jobsscraper.utils.ArgumentParser;
 import net.iselink.jobsscraper.utils.Configuration;
 import net.iselink.jobsscraper.utils.DiscordWebHook;
@@ -11,11 +12,13 @@ public class Main {
 
 	public static void main(String[] args) {
 		ArgumentParser ap = new ArgumentParser("./program");
+		ap.getRootCommand().setSubcommandRequired(true);
 
-		ArgumentParser.Flag confFlag = new ArgumentParser.Flag("config", "Configuration file to load", "config.json");
-		ap.getRootCommand().addFlag(confFlag);
+		ArgumentParser.Flag confFlag = ap.getRootCommand().addFlag(new ArgumentParser.Flag("config", "Configuration file to load", "config.json"));
+		ArgumentParser.Command scrapeCommand = ap.getRootCommand().addSubcommand(new ArgumentParser.Command("scrape", "Scrape website for info"));
+		ArgumentParser.Command scriptCommand = ap.getRootCommand().addSubcommand(new ArgumentParser.Command("script", "Execute JavaScript."));
 
-
+		ArgumentParser.Flag scriptFlag = scriptCommand.addFlag(new ArgumentParser.Flag("script", "JS script to execute.", "script.js"));
 		try {
 			ap.parse(args);
 		} catch (ArgumentParser.UndefinedFlagException | ArgumentParser.UndefinedCommandException |
@@ -24,11 +27,24 @@ public class Main {
 			System.exit(1);
 		}
 
-		try {
-			scrapeAction(ap, confFlag);
-		} catch (IOException | URISyntaxException | InterruptedException e) {
-			throw new RuntimeException(e);
+		if (ap.getRootCommand().getSelectedCommand() == scrapeCommand) {
+			try {
+				scrapeAction(ap, confFlag);
+			} catch (IOException | URISyntaxException | InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		} else if (ap.getRootCommand().getSelectedCommand() == scriptCommand) {
+			try {
+				executeScript(scriptFlag.getValue());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
+	}
+
+	private static void executeScript(String file) throws IOException {
+		Script script = Script.loadFromFile(file);
+		script.execute();
 	}
 
 	private static void scrapeAction(ArgumentParser ap, ArgumentParser.Flag confFlag) throws IOException, URISyntaxException, InterruptedException {

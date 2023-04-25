@@ -14,6 +14,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("org.jsoup:jsoup:1.15.4")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.mozilla:rhino:1.7.14")
+    implementation("org.mozilla:rhino-engine:1.7.14")
+    implementation("org.mozilla:rhino-runtime:1.7.14")
 }
 
 //https://stackoverflow.com/questions/75715341/toolchain-from-executable-property-does-not-match-toolchain-from-javalauncher
