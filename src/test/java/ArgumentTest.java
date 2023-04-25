@@ -2,7 +2,6 @@ import net.iselink.jobsscraper.utils.ArgumentParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIf;
 
 public class ArgumentTest {
 
@@ -12,7 +11,7 @@ public class ArgumentTest {
 	void emptyArguments() {
 		String[] args = new String[]{};
 
-		ArgumentParser ap = new ArgumentParser();
+		ArgumentParser ap = new ArgumentParser("test");
 		ap.getRootCommand().addFlag(new ArgumentParser.Flag("root-flag", "Root flag 1", null));
 		ap.getRootCommand().addFlag(new ArgumentParser.Flag("root-flag2", "Root flag 2", null));
 
@@ -51,7 +50,7 @@ public class ArgumentTest {
 				"--root-flag2=xd",
 		};
 
-		ArgumentParser ap = new ArgumentParser();
+		ArgumentParser ap = new ArgumentParser("test");
 		ap.getRootCommand().addFlag(new ArgumentParser.Flag("root-flag", "Root flag 1", null));
 		ap.getRootCommand().addFlag(new ArgumentParser.Flag("root-flag2", "Root flag 2", null));
 
@@ -74,9 +73,11 @@ public class ArgumentTest {
 			switch (s) {
 				case "root-flag":
 					Assertions.assertNull(flag.getValue());
+					Assertions.assertTrue(flag.isSetFromCLI());
 					break;
 				case "root-flag2":
 					Assertions.assertEquals("xd", flag.getValue());
+					Assertions.assertTrue(flag.isSetFromCLI());
 					break;
 				default:
 					Assertions.fail("Unknown flag name");
@@ -85,10 +86,12 @@ public class ArgumentTest {
 
 		c1.getFlags().forEach((s, flag) -> {
 			Assertions.assertNull(flag.getValue());
+			Assertions.assertFalse(flag.isSetFromCLI());
 		});
 
 		c1.getFlags().forEach((s, flag) -> {
 			Assertions.assertNull(flag.getValue());
+			Assertions.assertFalse(flag.isSetFromCLI());
 		});
 
 	}
@@ -100,7 +103,7 @@ public class ArgumentTest {
 				"subc1"
 		};
 
-		ArgumentParser ap = new ArgumentParser();
+		ArgumentParser ap = new ArgumentParser("test");
 		ap.getRootCommand().addFlag(new ArgumentParser.Flag("root-flag", "Root flag 1", null));
 		ap.getRootCommand().addFlag(new ArgumentParser.Flag("root-flag2", "Root flag 2", null));
 
@@ -120,14 +123,17 @@ public class ArgumentTest {
 
 		ap.getRootCommand().getFlags().forEach((s, flag) -> {
 			Assertions.assertNull(flag.getValue());
+			Assertions.assertFalse(flag.isSetFromCLI());
 		});
 
 		c1.getFlags().forEach((s, flag) -> {
 			Assertions.assertNull(flag.getValue());
+			Assertions.assertFalse(flag.isSetFromCLI());
 		});
 
 		c1.getFlags().forEach((s, flag) -> {
 			Assertions.assertNull(flag.getValue());
+			Assertions.assertFalse(flag.isSetFromCLI());
 		});
 
 	}
@@ -139,7 +145,7 @@ public class ArgumentTest {
 				"asdf"
 		};
 
-		ArgumentParser ap = new ArgumentParser();
+		ArgumentParser ap = new ArgumentParser("test");
 		ap.getRootCommand().addFlag(new ArgumentParser.Flag("root-flag", "Root flag 1", null));
 		ap.getRootCommand().addFlag(new ArgumentParser.Flag("root-flag2", "Root flag 2", null));
 
@@ -155,21 +161,26 @@ public class ArgumentTest {
 		ap.getRootCommand().addSubcommand(c2);
 
 
-		Assertions.assertThrows(ArgumentParser.UndefinedCommandException.class, () -> {
+		ArgumentParser.UndefinedCommandException ex = Assertions.assertThrows(ArgumentParser.UndefinedCommandException.class, () -> {
 			ap.parse(args);
 		});
 		Assertions.assertNull(ap.getRootCommand().getSelectedCommand());
+		Assertions.assertEquals("asdf", ex.getUnrecoginzedCommnad());
+		Assertions.assertSame(ex.getCommand(), ap.getRootCommand());
 
 		ap.getRootCommand().getFlags().forEach((s, flag) -> {
 			Assertions.assertNull(flag.getValue());
+			Assertions.assertFalse(flag.isSetFromCLI());
 		});
 
 		c1.getFlags().forEach((s, flag) -> {
 			Assertions.assertNull(flag.getValue());
+			Assertions.assertFalse(flag.isSetFromCLI());
 		});
 
 		c1.getFlags().forEach((s, flag) -> {
 			Assertions.assertNull(flag.getValue());
+			Assertions.assertFalse(flag.isSetFromCLI());
 		});
 
 	}
@@ -181,7 +192,7 @@ public class ArgumentTest {
 				"--asdf"
 		};
 
-		ArgumentParser ap = new ArgumentParser();
+		ArgumentParser ap = new ArgumentParser("test");
 		ap.getRootCommand().addFlag(new ArgumentParser.Flag("root-flag", "Root flag 1", null));
 		ap.getRootCommand().addFlag(new ArgumentParser.Flag("root-flag2", "Root flag 2", null));
 
@@ -197,26 +208,45 @@ public class ArgumentTest {
 		ap.getRootCommand().addSubcommand(c2);
 
 
-		Assertions.assertThrows(ArgumentParser.UndefinedFlagException.class, () -> {
+		ArgumentParser.UndefinedFlagException ex = Assertions.assertThrows(ArgumentParser.UndefinedFlagException.class, () -> {
 			ap.parse(args);
 		});
+		Assertions.assertEquals("asdf", ex.getUnrecognizedFlag());
 		Assertions.assertNull(ap.getRootCommand().getSelectedCommand());
 
 		ap.getRootCommand().getFlags().forEach((s, flag) -> {
 			Assertions.assertNull(flag.getValue());
+			Assertions.assertFalse(flag.isSetFromCLI());
 		});
 
 		c1.getFlags().forEach((s, flag) -> {
 			Assertions.assertNull(flag.getValue());
+			Assertions.assertFalse(flag.isSetFromCLI());
 		});
 
 		c1.getFlags().forEach((s, flag) -> {
 			Assertions.assertNull(flag.getValue());
+			Assertions.assertFalse(flag.isSetFromCLI());
 		});
 
 		ap.printHelp();
 
 	}
 
+	@Test
+	@DisplayName("Required subcommand test")
+	void checkRequiredSubcommandAttribute() {
+		ArgumentParser parser = new ArgumentParser("test");
+		parser.getRootCommand().setSubcommandRequired(true);
+
+		ArgumentParser.Command cmd1 = parser.getRootCommand().addSubcommand(new ArgumentParser.Command("command1", "just command1"));
+		ArgumentParser.Command cmd2 = parser.getRootCommand().addSubcommand(new ArgumentParser.Command("command2", "just command2"));
+
+		ArgumentParser.SubcommandNotSelectedException ex = Assertions.assertThrows(ArgumentParser.SubcommandNotSelectedException.class, () -> {
+			parser.parse(new String[]{});
+		});
+		Assertions.assertSame(ex.getCommand(), parser.getRootCommand());
+
+	}
 
 }

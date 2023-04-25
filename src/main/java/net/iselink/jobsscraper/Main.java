@@ -8,19 +8,30 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class Main {
-	public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
-		ArgumentParser ap = new ArgumentParser();
+
+	public static void main(String[] args) {
+		ArgumentParser ap = new ArgumentParser("./program");
+
 		ArgumentParser.Flag confFlag = new ArgumentParser.Flag("config", "Configuration file to load", "config.json");
 		ap.getRootCommand().addFlag(confFlag);
 
 
 		try {
 			ap.parse(args);
-		} catch (ArgumentParser.UndefinedFlagException | ArgumentParser.UndefinedCommandException e) {
+		} catch (ArgumentParser.UndefinedFlagException | ArgumentParser.UndefinedCommandException |
+				 ArgumentParser.SubcommandNotSelectedException e) {
 			//TODO: print help
 			System.exit(1);
 		}
 
+		try {
+			scrapeAction(ap, confFlag);
+		} catch (IOException | URISyntaxException | InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static void scrapeAction(ArgumentParser ap, ArgumentParser.Flag confFlag) throws IOException, URISyntaxException, InterruptedException {
 		Configuration configuration;
 		try {
 			configuration = Configuration.loadConfig(confFlag.getValue());
@@ -64,4 +75,5 @@ public class Main {
 
 		new DiscordWebHook(msg.toString()).send(configuration.getWebhookAddress());
 	}
+
 }
