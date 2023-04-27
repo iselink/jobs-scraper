@@ -23,7 +23,10 @@ public class Main {
 			ap.parse(args);
 		} catch (ArgumentParser.UndefinedFlagException | ArgumentParser.UndefinedCommandException |
 				 ArgumentParser.SubcommandNotSelectedException e) {
-			//TODO: print help
+			ap.printError(e);
+			System.exit(1);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 			System.exit(1);
 		}
 

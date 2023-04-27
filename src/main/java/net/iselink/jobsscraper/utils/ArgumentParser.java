@@ -35,6 +35,29 @@ public class ArgumentParser {
 		return rootCommand;
 	}
 
+	/**
+	 * Prints nicer (for end user) error to stderr.
+	 * If that exception doesn't have branch, this func will print at least stack trace.
+	 *
+	 * @param ex Argument parser exception to print.
+	 */
+	public void printError(ArgumentParserException ex) {
+		//TODO: use power of OOP to implement some interface with one method that will produce nice error message (instead of this if-else ... ).
+		if (ex instanceof UndefinedFlagException) {
+			System.err.printf("Unknown flag: %s.%n", ((UndefinedFlagException) ex).getUnrecognizedFlag());
+		} else if (ex instanceof UndefinedCommandException) {
+			System.err.printf("Unknown subcommand %s for command %s.%n", ((UndefinedCommandException) ex).getUnrecoginzedCommnad(), ((UndefinedCommandException) ex).getCommand().getName());
+		} else if (ex instanceof SubcommandNotSelectedException) {
+			System.err.printf("Command %s require to have specified subcommand.%n", ((SubcommandNotSelectedException) ex).getCommand().getName());
+			System.err.printf("List of available subcommands:%n");
+			((SubcommandNotSelectedException) ex).getCommand().getSubcommands().forEach((name, command) -> {
+				System.err.printf("%s - %s %n", name, command.getDescription() != null ? command.getDescription() : "(without description)");
+			});
+		} else {
+			ex.printStackTrace();
+		}
+	}
+
 	public static class Command {
 
 		private String name = null;
