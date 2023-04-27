@@ -1,6 +1,7 @@
 package net.iselink.jobsscraper.script;
 
 import net.iselink.jobsscraper.script.classes.ProgramJs;
+import net.iselink.jobsscraper.script.classes.WebRequestJS;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -34,6 +35,7 @@ public class Script {
 			ScriptableObject.putProperty(scope, "err", Context.javaToJS(System.err, scope));
 
 			ScriptableObject.defineClass(scope, ProgramJs.class);
+			ScriptableObject.defineClass(scope, WebRequestJS.class);
 
 			cx.evaluateString(scope, content, source, 1, null);
 		} catch (Exception e) {

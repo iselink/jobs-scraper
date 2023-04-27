@@ -2,8 +2,9 @@
 
 Scraper contains Rhino engine (from Mozilla) for scripting purposes.
 
-Example script file:
+## Examples
 
+### Scrape
 ```js
 'use strict';
 
@@ -22,4 +23,15 @@ let scraper = Program.newScraper(
 scraper.scrape();
 let comp = scraper.compareWith('save.json');
 Program.print(`added: ${comp.getAddedEntries().length}, removed: ${comp.getAddedEntries().length}`);
+```
+
+### Send POST request
+
+```js
+let wr = new WebRequest();
+wr.sendPost('http://localhost:8000/', JSON.stringify({
+    "xd": "xd"
+}));
+
+Program.print(wr.status_code);
 ```
