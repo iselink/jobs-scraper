@@ -40,7 +40,7 @@ public class Scraper {
 
 		adress = String.format(
 				"https://www.jobs.cz/prace/%s/%s&education=%s&locality[radius]=%d",
-				region, sb.toString(), education, radius
+				region, sb, education, radius
 		);
 	}
 

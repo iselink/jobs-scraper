@@ -12,34 +12,34 @@ import java.nio.file.Files;
 
 public class Script {
 
-    private String source = "<?>";
-    private String content = "";
+	private String source = "<?>";
+	private String content = "";
 
-    public Script(String source, String content) {
-        this.source = source;
-        this.content = content;
-    }
+	public Script(String source, String content) {
+		this.source = source;
+		this.content = content;
+	}
 
-    public static Script loadFromFile(String filename) throws IOException {
-        String content = Files.readString(new File(filename).toPath(), StandardCharsets.UTF_8);
-        return new Script(filename, content);
-    }
+	public static Script loadFromFile(String filename) throws IOException {
+		String content = Files.readString(new File(filename).toPath(), StandardCharsets.UTF_8);
+		return new Script(filename, content);
+	}
 
-    public void execute() {
-        try (Context cx = Context.enter()) {
-            cx.setLanguageVersion(Context.VERSION_ES6);
-            ScriptableObject scope = cx.initStandardObjects();
+	public void execute() {
+		try (Context cx = Context.enter()) {
+			cx.setLanguageVersion(Context.VERSION_ES6);
+			ScriptableObject scope = cx.initStandardObjects();
 
-            ScriptableObject.putProperty(scope, "out", Context.javaToJS(System.out, scope));
-            ScriptableObject.putProperty(scope, "err", Context.javaToJS(System.err, scope));
+			ScriptableObject.putProperty(scope, "out", Context.javaToJS(System.out, scope));
+			ScriptableObject.putProperty(scope, "err", Context.javaToJS(System.err, scope));
 
-            ScriptableObject.defineClass(scope, ProgramJs.class);
+			ScriptableObject.defineClass(scope, ProgramJs.class);
 
-            cx.evaluateString(scope, content, source, 1, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+			cx.evaluateString(scope, content, source, 1, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 
 }
