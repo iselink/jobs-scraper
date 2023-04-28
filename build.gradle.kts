@@ -32,3 +32,19 @@ gradle.taskGraph.whenReady {
 tasks.test {
     useJUnitPlatform()
 }
+
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = "net.iselink.jobsscraper.Main"
+    }
+}
+
+val fatJar = task("fatJar", type = Jar::class) {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    manifest {
+        attributes["Implementation-Version"] = version
+        attributes["Main-Class"] = "net.iselink.jobsscraper.Main"
+    }
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    with(tasks.jar.get() as CopySpec)
+}

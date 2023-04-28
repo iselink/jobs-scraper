@@ -8,6 +8,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -107,6 +108,11 @@ public class Scraper {
 	}
 
 	public Comparation compareWith(String filename) throws IOException {
+		File file = new File(filename);
+		if (!file.exists()) {
+			return new Comparation(new ArrayList<>(), new ArrayList<>(), items);
+		}
+
 		try (FileReader reader = new FileReader(filename)) {
 			Scraper scraper = new GsonBuilder()
 					.excludeFieldsWithoutExposeAnnotation().create().fromJson(reader, Scraper.class);
@@ -160,7 +166,14 @@ public class Scraper {
 		private List<Entry> removedEntries = new ArrayList<>();
 		private List<Entry> addedEntries = new ArrayList<>();
 
+
 		private Comparation() {
+		}
+
+		public Comparation(List<Entry> unchangedEntries, List<Entry> removedEntries, List<Entry> addedEntries) {
+			this.unchangedEntries = unchangedEntries;
+			this.removedEntries = removedEntries;
+			this.addedEntries = addedEntries;
 		}
 
 
