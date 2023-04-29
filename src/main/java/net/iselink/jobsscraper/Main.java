@@ -2,6 +2,7 @@ package net.iselink.jobsscraper;
 
 import net.iselink.jobsscraper.script.Script;
 import net.iselink.jobsscraper.utils.ArgumentParser;
+import net.iselink.jobsscraper.utils.CodeSplitter;
 import net.iselink.jobsscraper.utils.Configuration;
 import net.iselink.jobsscraper.utils.DiscordWebHook;
 
@@ -82,17 +83,21 @@ public class Main {
 		}));
 		webhook.send(configuration.getWebhookAddress());
 
-		StringBuilder msg = new StringBuilder();
-		msg.append("```diff");
+		CodeSplitter cs = new CodeSplitter(1000, "diff");
 		c.getAddedEntries().forEach(entry -> {
-			msg.append("\n+ ").append(entry.getTitle()).append("\t").append(entry.getLink());
+			cs.addLine("+ ", entry.getTitle(), "\t", entry.getLink());
 		});
 		c.getRemovedEntries().forEach(entry -> {
-			msg.append("\n- ").append(entry.getTitle());
+			cs.addLine("- ", entry.getTitle());
 		});
-		msg.append("```");
+		cs.getList().forEach(s -> {
+			try {
+				new DiscordWebHook(s).send(configuration.getWebhookAddress());
+			} catch (IOException | InterruptedException | URISyntaxException e) {
+				e.printStackTrace();
+			}
+		});
 
-		new DiscordWebHook(msg.toString()).send(configuration.getWebhookAddress());
 	}
 
 }
