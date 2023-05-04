@@ -19,10 +19,6 @@ public class JobsCzEntry extends BaseEntry {
 	private String title = null;
 
 	@Expose
-	@SerializedName("link")
-	private String link = null;
-
-	@Expose
 	@SerializedName("secondary_info")
 	private List<String> secInfo = new ArrayList<>();
 
@@ -38,8 +34,11 @@ public class JobsCzEntry extends BaseEntry {
 	@SerializedName("status")
 	private String status = null;
 
+	public JobsCzEntry(String link) {
+		super(link);
+	}
+
 	public static JobsCzEntry fromElement(Element element) {
-		JobsCzEntry e = new JobsCzEntry();
 
 		Elements titleLink = element.getElementsByClass("search-list__main-info__title__link");
 		if (titleLink.isEmpty()) {
@@ -52,8 +51,8 @@ public class JobsCzEntry extends BaseEntry {
 
 		Elements tags = element.getElementsByClass("search-list__tags__default");
 
+		JobsCzEntry e = new JobsCzEntry(Utils.cleanUrl(titleLink.get(0).attr("href")));
 		e.title = titleLink.get(0).text();
-		e.link = Utils.cleanUrl(titleLink.get(0).attr("href"));
 		secInfo.forEach(element1 -> {
 			element1.getElementsByClass("search-list__secondary-info").forEach(element2 -> {
 				e.secInfo.add(element2.text());
@@ -81,9 +80,6 @@ public class JobsCzEntry extends BaseEntry {
 		return title;
 	}
 
-	public String getLink() {
-		return link;
-	}
 
 	@Override
 	public String toString() {

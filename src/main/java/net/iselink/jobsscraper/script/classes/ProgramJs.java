@@ -1,6 +1,6 @@
 package net.iselink.jobsscraper.script.classes;
 
-import net.iselink.jobsscraper.JobsCzScraper;
+import net.iselink.jobsscraper.scrapers.JobsCzScraper;
 import net.iselink.jobsscraper.utils.Configuration;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;

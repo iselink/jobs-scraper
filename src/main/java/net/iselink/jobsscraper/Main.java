@@ -1,10 +1,9 @@
 package net.iselink.jobsscraper;
 
+import net.iselink.jobsscraper.scrapers.JobsCzScraper;
 import net.iselink.jobsscraper.script.Script;
 import net.iselink.jobsscraper.utils.ArgumentParser;
-import net.iselink.jobsscraper.utils.CodeSplitter;
 import net.iselink.jobsscraper.utils.Configuration;
-import net.iselink.jobsscraper.utils.DiscordWebHook;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -64,39 +63,31 @@ public class Main {
 				configuration.getScraper().getEducation(),
 				configuration.getScraper().getRadius()
 		);
-
 		jobsCzScraper.scrape();
+		jobsCzScraper.saveToFile("jobs_cz.json");
 
-		JobsCzScraper.Comparation c = jobsCzScraper.compareWith("save.json");
-		jobsCzScraper.save("save.json");
+		/**DiscordWebHook webhook = new DiscordWebHook(new DiscordWebHook.Embed("Job search report", "", new DiscordWebHook.Field[]{
+		 new DiscordWebHook.Field("Added jobs", Integer.toString(c.getAddedEntries().size()), true),
+		 new DiscordWebHook.Field("Removed jobs", Integer.toString(c.getRemovedEntries().size()), true),
+		 new DiscordWebHook.Field("Unchanged jobs", Integer.toString(c.getUnchangedEntries().size()), true),
+		 new DiscordWebHook.Field("Total count now", Integer.toString(jobsCzScraper.getEntriesCount()), true)
+		 }));
+		 webhook.send(configuration.getWebhookAddress());
 
-		if (c.getRemovedEntries().size() == 0 && c.getAddedEntries().size() == 0) {
-			//as there isn't any changes, don't push pointless message
-			return;
-		}
-
-		DiscordWebHook webhook = new DiscordWebHook(new DiscordWebHook.Embed("Job search report", "", new DiscordWebHook.Field[]{
-				new DiscordWebHook.Field("Added jobs", Integer.toString(c.getAddedEntries().size()), true),
-				new DiscordWebHook.Field("Removed jobs", Integer.toString(c.getRemovedEntries().size()), true),
-				new DiscordWebHook.Field("Unchanged jobs", Integer.toString(c.getUnchangedEntries().size()), true),
-				new DiscordWebHook.Field("Total count now", Integer.toString(jobsCzScraper.getEntriesCount()), true)
-		}));
-		webhook.send(configuration.getWebhookAddress());
-
-		CodeSplitter cs = new CodeSplitter(1000, "diff");
-		c.getAddedEntries().forEach(entry -> {
-			cs.addLine("+ ", entry.getTitle(), "\t", entry.getLink());
-		});
-		c.getRemovedEntries().forEach(entry -> {
-			cs.addLine("- ", entry.getTitle());
-		});
-		cs.getList().forEach(s -> {
-			try {
-				new DiscordWebHook(s).send(configuration.getWebhookAddress());
-			} catch (IOException | InterruptedException | URISyntaxException e) {
-				e.printStackTrace();
-			}
-		});
+		 CodeSplitter cs = new CodeSplitter(1000, "diff");
+		 c.getAddedEntries().forEach(entry -> {
+		 cs.addLine("+ ", entry.getTitle(), "\t", entry.getLink());
+		 });
+		 c.getRemovedEntries().forEach(entry -> {
+		 cs.addLine("- ", entry.getTitle());
+		 });
+		 cs.getList().forEach(s -> {
+		 try {
+		 new DiscordWebHook(s).send(configuration.getWebhookAddress());
+		 } catch (IOException | InterruptedException | URISyntaxException e) {
+		 e.printStackTrace();
+		 }
+		 });**/
 
 	}
 
