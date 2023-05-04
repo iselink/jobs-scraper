@@ -1,6 +1,6 @@
 package net.iselink.jobsscraper.script.classes;
 
-import net.iselink.jobsscraper.Scraper;
+import net.iselink.jobsscraper.JobsCzScraper;
 import net.iselink.jobsscraper.utils.Configuration;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -29,12 +29,12 @@ public class ProgramJs extends ScriptableObject {
 	}
 
 	@JSStaticFunction
-	public static Scraper newScraper(Context cx, Scriptable thisObj, Object[] args, Function funObj) throws IOException {
+	public static JobsCzScraper newScraper(Context cx, Scriptable thisObj, Object[] args, Function funObj) throws IOException {
 		if (args.length != 4) {
 			Context.reportError("Invalid arg count.");
 			return null;
 		}
-		return new Scraper(
+		return new JobsCzScraper(
 				(String) Context.jsToJava(args[0], String.class),
 				(String[]) Context.jsToJava(args[1], String[].class),
 				(String) Context.jsToJava(args[2], String.class),

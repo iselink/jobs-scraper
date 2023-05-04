@@ -59,16 +59,16 @@ public class Main {
 			throw new RuntimeException(e);
 		}
 
-		Scraper scraper = new Scraper(configuration.getScraper().getRegion(),
+		JobsCzScraper jobsCzScraper = new JobsCzScraper(configuration.getScraper().getRegion(),
 				configuration.getScraper().getFields(),
 				configuration.getScraper().getEducation(),
 				configuration.getScraper().getRadius()
 		);
 
-		scraper.scrape();
+		jobsCzScraper.scrape();
 
-		Scraper.Comparation c = scraper.compareWith("save.json");
-		scraper.save("save.json");
+		JobsCzScraper.Comparation c = jobsCzScraper.compareWith("save.json");
+		jobsCzScraper.save("save.json");
 
 		if (c.getRemovedEntries().size() == 0 && c.getAddedEntries().size() == 0) {
 			//as there isn't any changes, don't push pointless message
@@ -79,7 +79,7 @@ public class Main {
 				new DiscordWebHook.Field("Added jobs", Integer.toString(c.getAddedEntries().size()), true),
 				new DiscordWebHook.Field("Removed jobs", Integer.toString(c.getRemovedEntries().size()), true),
 				new DiscordWebHook.Field("Unchanged jobs", Integer.toString(c.getUnchangedEntries().size()), true),
-				new DiscordWebHook.Field("Total count now", Integer.toString(scraper.getEntriesCount()), true)
+				new DiscordWebHook.Field("Total count now", Integer.toString(jobsCzScraper.getEntriesCount()), true)
 		}));
 		webhook.send(configuration.getWebhookAddress());
 

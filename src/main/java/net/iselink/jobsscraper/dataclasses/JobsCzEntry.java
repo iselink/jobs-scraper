@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Entry for job item.
  */
-public class Entry {
+public class JobsCzEntry extends BaseEntry {
 
 	@Expose
 	@SerializedName("title")
@@ -38,8 +38,8 @@ public class Entry {
 	@SerializedName("status")
 	private String status = null;
 
-	public static Entry fromElement(Element element) {
-		Entry e = new Entry();
+	public static JobsCzEntry fromElement(Element element) {
+		JobsCzEntry e = new JobsCzEntry();
 
 		Elements titleLink = element.getElementsByClass("search-list__main-info__title__link");
 		if (titleLink.isEmpty()) {

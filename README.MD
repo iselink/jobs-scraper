@@ -25,8 +25,8 @@ This file have the following parameters preset:
 
 ```json
 {
-	"scraper": {
-		"region": "<your region>",
+  "jobsCzScraper": {
+    "region": "<your region>",
 		"fields": [
 			"200900013",
 			"200900012"

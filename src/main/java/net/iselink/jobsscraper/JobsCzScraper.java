@@ -3,7 +3,7 @@ package net.iselink.jobsscraper;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import net.iselink.jobsscraper.dataclasses.Entry;
+import net.iselink.jobsscraper.dataclasses.JobsCzEntry;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Scraper {
+public class JobsCzScraper {
 
 	@Expose
 	@SerializedName("timestamp")
@@ -29,9 +29,9 @@ public class Scraper {
 
 	@Expose
 	@SerializedName("items")
-	private List<Entry> items = new ArrayList<>();
+	private List<JobsCzEntry> items = new ArrayList<>();
 
-	public Scraper(String region, String[] fields, String education, int radius) {
+	public JobsCzScraper(String region, String[] fields, String education, int radius) {
 		StringBuilder sb = new StringBuilder();
 
 		for (String field : fields) {
@@ -76,7 +76,7 @@ public class Scraper {
 		Elements items = doc.getElementsByClass("standalone search-list__item");
 
 		items.forEach(element -> {
-			Entry e = Entry.fromElement(element);
+			JobsCzEntry e = JobsCzEntry.fromElement(element);
 			if (e != null)
 				this.items.add(e);
 		});
@@ -85,7 +85,7 @@ public class Scraper {
 		return next.isEmpty();
 	}
 
-	public List<Entry> getEntries() {
+	public List<JobsCzEntry> getEntries() {
 		return items;
 	}
 
@@ -114,21 +114,21 @@ public class Scraper {
 		}
 
 		try (FileReader reader = new FileReader(filename)) {
-			Scraper scraper = new GsonBuilder()
-					.excludeFieldsWithoutExposeAnnotation().create().fromJson(reader, Scraper.class);
-			return compareWith(scraper.items);
+			JobsCzScraper jobsCzScraper = new GsonBuilder()
+					.excludeFieldsWithoutExposeAnnotation().create().fromJson(reader, JobsCzScraper.class);
+			return compareWith(jobsCzScraper.items);
 		}
 	}
 
 
-	public Comparation compareWith(List<Entry> entries) {
+	public Comparation compareWith(List<JobsCzEntry> entries) {
 		Comparation comp = new Comparation();
 
 		//find all unchanged items
 		//i.e. - only items in both lists
-		comp.unchangedEntries = items.stream().filter(entry -> {
-			for (Entry entry1 : entries) {
-				if (entry.getLink().equalsIgnoreCase(entry1.getLink())) {
+		comp.unchangedEntries = items.stream().filter(jobsCzEntry -> {
+			for (JobsCzEntry jobsCzEntry1 : entries) {
+				if (jobsCzEntry.getLink().equalsIgnoreCase(jobsCzEntry1.getLink())) {
 					return true;
 				}
 			}
@@ -137,9 +137,9 @@ public class Scraper {
 
 		//find new offers
 		//i.e. - only items from new list which aren't in old
-		comp.addedEntries = items.stream().filter(entry -> {
-			for (Entry e : entries) {
-				if (entry.getLink().equalsIgnoreCase(e.getLink())) {
+		comp.addedEntries = items.stream().filter(jobsCzEntry -> {
+			for (JobsCzEntry e : entries) {
+				if (jobsCzEntry.getLink().equalsIgnoreCase(e.getLink())) {
 					return false;
 				}
 			}
@@ -148,9 +148,9 @@ public class Scraper {
 
 		//find old (removed) offers
 		//i.e. - only items from old list which aren't in new
-		comp.removedEntries = entries.stream().filter(entry -> {
-			for (Entry e : items) {
-				if (entry.getLink().equalsIgnoreCase(e.getLink())) {
+		comp.removedEntries = entries.stream().filter(jobsCzEntry -> {
+			for (JobsCzEntry e : items) {
+				if (jobsCzEntry.getLink().equalsIgnoreCase(e.getLink())) {
 					return false;
 				}
 			}
@@ -162,44 +162,44 @@ public class Scraper {
 
 	public static class Comparation {
 
-		private List<Entry> unchangedEntries = new ArrayList<>();
-		private List<Entry> removedEntries = new ArrayList<>();
-		private List<Entry> addedEntries = new ArrayList<>();
+		private List<JobsCzEntry> unchangedEntries = new ArrayList<>();
+		private List<JobsCzEntry> removedEntries = new ArrayList<>();
+		private List<JobsCzEntry> addedEntries = new ArrayList<>();
 
 
 		private Comparation() {
 		}
 
-		public Comparation(List<Entry> unchangedEntries, List<Entry> removedEntries, List<Entry> addedEntries) {
+		public Comparation(List<JobsCzEntry> unchangedEntries, List<JobsCzEntry> removedEntries, List<JobsCzEntry> addedEntries) {
 			this.unchangedEntries = unchangedEntries;
 			this.removedEntries = removedEntries;
 			this.addedEntries = addedEntries;
 		}
 
 
-		public List<Entry> getUnchangedEntries() {
+		public List<JobsCzEntry> getUnchangedEntries() {
 			return unchangedEntries;
 		}
 
-		public Comparation setUnchangedEntries(List<Entry> unchangedEntries) {
+		public Comparation setUnchangedEntries(List<JobsCzEntry> unchangedEntries) {
 			this.unchangedEntries = unchangedEntries;
 			return this;
 		}
 
-		public List<Entry> getRemovedEntries() {
+		public List<JobsCzEntry> getRemovedEntries() {
 			return removedEntries;
 		}
 
-		public Comparation setRemovedEntries(List<Entry> removedEntries) {
+		public Comparation setRemovedEntries(List<JobsCzEntry> removedEntries) {
 			this.removedEntries = removedEntries;
 			return this;
 		}
 
-		public List<Entry> getAddedEntries() {
+		public List<JobsCzEntry> getAddedEntries() {
 			return addedEntries;
 		}
 
-		public Comparation setAddedEntries(List<Entry> addedEntries) {
+		public Comparation setAddedEntries(List<JobsCzEntry> addedEntries) {
 			this.addedEntries = addedEntries;
 			return this;
 		}
