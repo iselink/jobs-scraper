@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entry for job item.
+ * Item entry for jobs.cz
  */
 public class JobsCzEntry extends BaseEntry {
 

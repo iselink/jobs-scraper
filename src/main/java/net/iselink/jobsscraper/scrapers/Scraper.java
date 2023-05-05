@@ -17,6 +17,9 @@ import java.util.List;
  */
 public abstract class Scraper<T extends BaseEntry> {
 
+	/**
+	 * Class name of the scraper which has been used for scraping these entries.
+	 */
 	@Expose
 	@SerializedName("scraper")
 	public final String type = getClass().getSimpleName();
@@ -34,6 +37,7 @@ public abstract class Scraper<T extends BaseEntry> {
 
 	/**
 	 * Perform scraping.
+	 * Blocks thread and set timestamp.
 	 */
 	//TODO: make return future or some kind of processing parallelization
 	public final void scrape() {
@@ -41,14 +45,32 @@ public abstract class Scraper<T extends BaseEntry> {
 		onScrape();
 	}
 
+	/**
+	 * Internal method for performing actual scraping.
+	 * Executed after updating timestamp.
+	 */
 	protected abstract void onScrape();
 
+	/**
+	 * Load entries from file, useful in comparation for loading older entries..
+	 * File must be a valid JSON.
+	 *
+	 * @param filename Name of the file.
+	 * @throws IOException
+	 */
 	public void loadFromFile(String filename) throws IOException {
 		try (FileReader reader = new FileReader(filename)) {
 			new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().fromJson(reader, getClass());
 		}
 	}
 
+	/**
+	 * Save current entries to the JSON file.
+	 * This will also store some metadata about scraper itself, including address and timestamp.
+	 *
+	 * @param filename name of the file.
+	 * @throws IOException
+	 */
 	public void saveToFile(String filename) throws IOException {
 		try (FileWriter writer = new FileWriter(filename)) {
 			new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(this, getClass(), writer);
@@ -58,6 +80,8 @@ public abstract class Scraper<T extends BaseEntry> {
 
 	/**
 	 * Compare current scraped list with different list.
+	 * Specified list will be treated as older list.
+	 * Which mean items missing in scraper and present in param list will be treated as removed.
 	 *
 	 * @param list List to compare
 	 * @return Returns comparation of both lists.

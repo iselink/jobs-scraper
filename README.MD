@@ -3,6 +3,8 @@
 This small java program will scrape jobs from `jobs.cz` and report any changes to the discord webhook.  
 It is always good to know your opportunities.
 
+**JS is currently broken by changes...**
+
 ## Program arguments
 
 Command line arguments are composed of two types - flags and commands.  
@@ -22,18 +24,27 @@ This file have the following parameters preset:
 - job field - `IS/IT: Vývoj aplikací a systémů` and `IS/IT: Správa systémů a HW`
 - distance - 40 km radius from your region
 - education - `high` (`SŠ s maturitou`)
+- scraper_prace_cz_url - URL for query on prace.cz.
+
+Every URL must be not escaped.  
+For example `%20` (escaped space) in URL is not permitted.
 
 ```json
 {
   "jobsCzScraper": {
-    "region": "<your region>",
-		"fields": [
-			"200900013",
-			"200900012"
-		],
-		"education": "high",
-		"radius": 40
-	},
-	"webhook": "<Discord webhook>"
+    "scrapers": {
+      "scraper_job_cz": {
+        "region": "<your region>",
+        "fields": [
+          "200900013",
+          "200900012"
+        ],
+        "education": "high",
+        "radius": 40
+      },
+      "scraper_prace_cz_url": "<address>"
+    }
+  },
+  "webhook": "<Discord webhook>"
 }
 ```

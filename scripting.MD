@@ -2,9 +2,12 @@
 
 Scraper contains Rhino engine (from Mozilla) for scripting purposes.
 
+**Scripting is currently broken.**
+
 ## Examples
 
 ### Scrape
+
 ```js
 'use strict';
 

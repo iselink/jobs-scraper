@@ -3,6 +3,9 @@ package net.iselink.jobsscraper.dataclasses;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Item entry for prace.cz
+ */
 public class PraceCzEntry extends BaseEntry {
 
 	@Expose
