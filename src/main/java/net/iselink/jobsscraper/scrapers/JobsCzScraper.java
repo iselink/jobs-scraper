@@ -8,8 +8,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Scraper responsible for jobs.cz server.
@@ -73,59 +71,6 @@ public class JobsCzScraper extends Scraper<JobsCzEntry> {
 
 		Elements next = doc.getElementsByClass("button button--slim pager__next");
 		return next.isEmpty();
-	}
-
-
-	@Override
-	public Comparation<JobsCzEntry> compareWith(List<JobsCzEntry> secondList) {
-		//this is the place, where time complexity dies
-		//added list - items in current list, which are not in second list
-		//removed list - items missing in current list, which are in second list
-		//unchanged list - items which are in both lists
-		List<JobsCzEntry> addedList = new ArrayList<>();
-		List<JobsCzEntry> removedList = new ArrayList<>();
-		List<JobsCzEntry> unchagedList = new ArrayList<>();
-
-		//added
-		for (JobsCzEntry currentItem : items) {
-			boolean found = false;
-			for (JobsCzEntry secondItem : secondList) {
-				if (currentItem.getLink().equalsIgnoreCase(secondItem.getLink())) {
-					found = true;
-					break;
-				}
-			}
-
-			if (!found) {
-				addedList.add(currentItem);
-			}
-		}
-
-		//removed
-		for (JobsCzEntry secondItem : secondList) {
-			boolean found = false;
-			for (JobsCzEntry currentItem : items) {
-				if (currentItem.getLink().equalsIgnoreCase(secondItem.getLink())) {
-					found = true;
-					break;
-				}
-			}
-
-			if (!found) {
-				removedList.add(secondItem);
-			}
-		}
-
-		//unchanged
-		for (JobsCzEntry currentItem : items) {
-			for (JobsCzEntry secondItem : secondList) {
-				if (currentItem.getLink().equalsIgnoreCase(secondItem.getLink())) {
-					unchagedList.add(currentItem);
-				}
-			}
-		}
-
-		return new Comparation<>(unchagedList, addedList, removedList);
 	}
 
 }

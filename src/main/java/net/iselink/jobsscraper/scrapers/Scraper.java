@@ -24,6 +24,8 @@ public abstract class Scraper<T extends BaseEntry> {
 	/**
 	 * List of job offers from page.
 	 */
+	@Expose
+	@SerializedName("items")
 	protected final List<T> items = new ArrayList<>();
 
 	@Expose
@@ -49,7 +51,7 @@ public abstract class Scraper<T extends BaseEntry> {
 
 	public void saveToFile(String filename) throws IOException {
 		try (FileWriter writer = new FileWriter(filename)) {
-			new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(this, writer);
+			new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(this, getClass(), writer);
 		}
 	}
 

@@ -1,4 +1,4 @@
-package net.iselink.jobsscraper.utils;
+package net.iselink.jobsscraper.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,11 +9,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+
 public class Configuration {
 
 	@Expose
-	@SerializedName("scraper")
-	private Scraper scraper = null;
+	@SerializedName("scrapers")
+	private Scrapers scrapers = null;
 
 	@Expose
 	@SerializedName("webhook")
@@ -26,15 +27,37 @@ public class Configuration {
 		}
 	}
 
-	public Scraper getScraper() {
-		return scraper;
-	}
 
 	public String getWebhookAddress() {
 		return webhookAddress;
 	}
 
-	public static class Scraper {
+	public Scrapers getScrapers() {
+		return scrapers;
+	}
+
+	public static class Scrapers {
+		@Expose
+		@SerializedName("scraper_job_cz")
+		private ScraperJobCz scraperJobCz;
+
+		@Expose
+		@SerializedName("scraper_prace_cz_url")
+		private String praceCzUrl;
+
+		public ScraperJobCz getScraperJobCz() {
+			return scraperJobCz;
+		}
+
+		public String getPraceCzUrl() {
+			return praceCzUrl;
+		}
+	}
+
+	/**
+	 * Dedicated class for holding job.cz configuration.
+	 */
+	public static class ScraperJobCz {
 		@Expose
 		@SerializedName("region")
 		private String region;
@@ -67,4 +90,18 @@ public class Configuration {
 			return radius;
 		}
 	}
+
+	/**
+	 * Base class for holding prace.cz configuration.
+	 */
+	//TODO: rework config for this scraper (currently using direct url)
+
+	//	public static class ScraperPraceCz {
+	//
+	//		private List<String> localityCodes;
+	//		private List<String> professions;
+	//		private List<String> searchTerms;
+	//		private List<String> employmentTypes;
+	//		private ;
+	//	}
 }

@@ -1,9 +1,10 @@
 package net.iselink.jobsscraper;
 
+import net.iselink.jobsscraper.config.Configuration;
 import net.iselink.jobsscraper.scrapers.JobsCzScraper;
+import net.iselink.jobsscraper.scrapers.PraceCzScraper;
 import net.iselink.jobsscraper.script.Script;
 import net.iselink.jobsscraper.utils.ArgumentParser;
-import net.iselink.jobsscraper.utils.Configuration;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -58,36 +59,18 @@ public class Main {
 			throw new RuntimeException(e);
 		}
 
-		JobsCzScraper jobsCzScraper = new JobsCzScraper(configuration.getScraper().getRegion(),
-				configuration.getScraper().getFields(),
-				configuration.getScraper().getEducation(),
-				configuration.getScraper().getRadius()
+		JobsCzScraper jobsCzScraper = new JobsCzScraper(configuration.getScrapers().getScraperJobCz().getRegion(),
+				configuration.getScrapers().getScraperJobCz().getFields(),
+				configuration.getScrapers().getScraperJobCz().getEducation(),
+				configuration.getScrapers().getScraperJobCz().getRadius()
 		);
 		jobsCzScraper.scrape();
 		jobsCzScraper.saveToFile("jobs_cz.json");
 
-		/**DiscordWebHook webhook = new DiscordWebHook(new DiscordWebHook.Embed("Job search report", "", new DiscordWebHook.Field[]{
-		 new DiscordWebHook.Field("Added jobs", Integer.toString(c.getAddedEntries().size()), true),
-		 new DiscordWebHook.Field("Removed jobs", Integer.toString(c.getRemovedEntries().size()), true),
-		 new DiscordWebHook.Field("Unchanged jobs", Integer.toString(c.getUnchangedEntries().size()), true),
-		 new DiscordWebHook.Field("Total count now", Integer.toString(jobsCzScraper.getEntriesCount()), true)
-		 }));
-		 webhook.send(configuration.getWebhookAddress());
+		PraceCzScraper scraper = new PraceCzScraper(configuration.getScrapers().getPraceCzUrl());
+		scraper.scrape();
+		scraper.saveToFile("prace_cz.json");
 
-		 CodeSplitter cs = new CodeSplitter(1000, "diff");
-		 c.getAddedEntries().forEach(entry -> {
-		 cs.addLine("+ ", entry.getTitle(), "\t", entry.getLink());
-		 });
-		 c.getRemovedEntries().forEach(entry -> {
-		 cs.addLine("- ", entry.getTitle());
-		 });
-		 cs.getList().forEach(s -> {
-		 try {
-		 new DiscordWebHook(s).send(configuration.getWebhookAddress());
-		 } catch (IOException | InterruptedException | URISyntaxException e) {
-		 e.printStackTrace();
-		 }
-		 });**/
 
 	}
 
